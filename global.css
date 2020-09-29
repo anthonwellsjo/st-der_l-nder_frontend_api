@@ -1,3 +1,5 @@
+/* --------------------------------------------------GLOBAL */
+
 html,
 body {
 }
@@ -20,75 +22,104 @@ body {
   justify-content: center;
   background-color: black;
   color: white;
+  border-bottom: 3px solid black;
 }
 
 #header h1 {
   font-size: 80px;
 }
 
-
-/* SIDEBAR */
+/* ----------------------------------------------------------SIDEBAR */
 
 #sidebar {
   position: absolute;
   top: 150px;
   left: 0;
-  bottom: 0;
+  height: 400px;
   width: 200px;
-  background-color: grey;
+  border-top: 3px solid black;
+  
 }
 
-#countryHeader{
+#countryHeader {
   position: absolute;
-  top:-50px;
-  left:0;
-  right:0;
+  top: -50px;
+  left: 0;
+  right: 0;
   height: 50px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  padding-left: 20px;
 }
+
+#countryHeader:hover {
+  background-color: grey;
+}
+
+/* -------------------------------------------CENTER PAGE */
 
 #centerPage {
   position: absolute;
   left: 200px;
-  top: 100px;
+  top: 150px;
   bottom: 0;
   right: 0;
-  background-color: darkgoldenrod;
+  border-top: 3px solid black;
 }
 
-#cityHeader{
-  position: relative;
-  top:0;
-  left:0;
-  right:0;
+#cityHeader {
+  position: absolute;
+  top: -50px;
+  left: 0;
+  right: 0;
   height: 50px;
-  background-color: blue;
   display: flex;
   align-items: center;
-  justify-content: center;
+  padding-left: 20px;
 }
 
-/* LISTS */
+#cityHeaderH2 {
+  transform: scale(0);
+  transition: transform 0.3s;
+}
+
+#cityHeaderH2.show {
+  transform: scale(1);
+  transition: transform 0.3s;
+}
+
+#cityListHolder {
+}
+
+/* ---------------------------------------------------------LISTS */
 
 li {
   list-style-type: none;
   padding: 10px;
   text-align: center;
   margin: 10px;
+  transform: scale(0);
+  transition: transform 0.3s;
 }
+li.show {
+  transform: scale(1);
+  transition: transform 0.3s;
+}
+
 li:hover {
   box-shadow: 3px 2px 5px black;
 }
 li.active {
-  background-color: black;
+  box-shadow: 3px 2px 5px black;
 }
 
 #countryOl {
 }
 
-/* MODAL */
+ul {
+}
+
+/* --------------------------------------------------------------MODAL */
 
 #modalHolder {
   position: absolute;
@@ -109,12 +140,12 @@ li.active {
   background-color: white;
   border: 3px solid black;
   transform: translateY(-250%);
-  transition: transform .3s;
+  transition: transform 0.3s;
 }
 
-.cityModal.open{
+.cityModal.open {
   transform: translateY(0);
-  transition: transform .3s;
+  transition: transform 0.3s;
 }
 
 #modalWindowHeader {
@@ -141,16 +172,16 @@ li.active {
   border: none;
   padding: 10px;
   border-radius: 20px;
-  transition: box-shadow .3s;
+  transition: box-shadow 0.3s;
   outline: none;
 }
 
 #closeModalBtn:hover {
   box-shadow: 3px 2px 4px grey;
-  transition: box-shadow .3s;
+  transition: box-shadow 0.3s;
 }
 
-#modalContainer{
+#modalContainer {
   width: 100%;
   height: 80%;
   display: flex;
@@ -158,7 +189,7 @@ li.active {
   justify-content: center;
 }
 
-#modalHeader{
+#modalHeader {
   position: absolute;
   width: 80%;
   top: 0px;
@@ -168,7 +199,7 @@ li.active {
   justify-content: center;
 }
 
-#modalContent{
+#modalContent {
   position: absolute;
   width: 90%;
   top: 70px;
@@ -176,12 +207,11 @@ li.active {
   display: grid;
 }
 
-#countryVisitedBtn{
-  
+#countryVisitedBtn {
 }
 
-.visited{
-  transition: background-color .3s;
+.visited {
+  transition: background-color 0.3s;
   background-color: red;
 }
 
@@ -194,22 +224,47 @@ li.active {
   flex-direction: column;
 }
 
-#checkBoxComment{
+#checkBoxComment {
   margin-top: -10px;
 }
 
-.backDrop{
+.backDrop {
   transform: translateY(-220%);
   background-color: black;
-  opacity: .6;
+  opacity: 0.6;
   z-index: 100;
   position: absolute;
-  top:0;
-  left:0;
-  right:0;
-  bottom:0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
-.backDrop.show{
+.backDrop.show {
   transform: translateY(0);
+}
+
+/* ---------------------------------------------BORDERS */
+
+#sidebarVerticalBorder {
+  margin-top: -50px;
+  position: absolute;
+  right: 0;
+  width: 3px;
+  height: 0;
+  background-color: black;
+  transition: height .7s;
+}
+
+#sidebarVerticalBorder.show{
+  height: 400px;
+  transition: height .7s;
+}
+
+#headerBottomBorder{
+  position: absolute;
+  bottom: 0;
+  height: 3px;
+  width: 300px;
+  background-color: black;
 }
