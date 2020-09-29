@@ -89,6 +89,9 @@ const page = {
                                 <header id="modalHeader">
                                 </header>
                                 <content id="modalContent">
+                                    <div id="inputHolder">
+                                        <button id="countryVisitedBtn">Add to visisted</button>
+                                    </div>
                                 </content
                             </div>
                         </div>
@@ -105,15 +108,30 @@ const page = {
         content.innerText = `
         ${page.currentCity.stadname} är en stad som ligger i ${page.currentCountry.countryname} och har ${page.currentCity.population} invånare.
         `
+        document.getElementById("modalContent").prepend(content);
 
         //Lägg till class på modalContent som gör transition med translateY (med timeout annars blir det ingen animation)
-        document.getElementById("modalContent").appendChild(content);
         setTimeout(() => { document.getElementsByClassName("cityModal")[0].classList.add("open"); }, 10)
 
-        //Skapa event hanlder på stäng-knapp
+        //Skapa event handler på stäng-knapp
         document.getElementById("closeModalBtn").addEventListener("click", eventHandlers.onModalBtnClosedClickedEventHandler)
 
+        //Skapa event handler på add-to-visited-knapp
+        document.getElementById("countryVisitedBtn").addEventListener("click", eventHandlers.onCountryVisitedBtnClickedEventHandler)
 
+        //Kryssa för eller ur add-to-visited-knapp
+        page.renderVisitedButton();
+
+    },
+    renderVisitedButton: () => {
+        let visitedBtn = document.getElementById("countryVisitedBtn");
+        if (appData.citiesVisited.includes(page.currentCity.id)) {
+            visitedBtn.innerText = "Remove from visited";
+            visitedBtn.classList.add("visited");
+        } else {
+            visitedBtn.innerText = "Add to visited";
+            visitedBtn.className = ""
+        }
     },
     pageName: "Travel Partner",
     currentCountry: null,
@@ -148,7 +166,8 @@ const appData = {
     }),
     hasBeenFetched: false,
     cities: {},
-    countries: {}
+    countries: {},
+    citiesVisited: []
 }
 
 
@@ -163,6 +182,15 @@ const eventHandlers = {
         console.log("curr city", page.currentCity);
     },
     onModalBtnClosedClickedEventHandler: () => {
-        document.getElementsByClassName("cityModal")[0].classList.remove("open"); 
+        document.getElementsByClassName("cityModal")[0].classList.remove("open");
+    },
+    onCountryVisitedBtnClickedEventHandler: () => {
+        if (!appData.citiesVisited.includes(page.currentCity.id)) {
+            appData.citiesVisited.push(page.currentCity.id);
+        } else {
+            appData.citiesVisited = appData.citiesVisited.filter(c => c !== page.currentCity.id)
+        }
+
+        page.renderVisitedButton();
     }
 }
