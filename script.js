@@ -8,6 +8,7 @@ async function loadApp() {
     appData
     page.appendChild(page.create(), app);
     page.renderCountryList();
+    page.createUnchangingEventHandlers();
 
 }
 
@@ -20,14 +21,20 @@ const page = {
     create: function () {
         return (
             `<div id="pageHolder">
-                    <div id="modalHolder">
-                        
-                    </div>
+                <div id="modalHolder">
+                </div>
+                <div class="backDrop">
+                </div>
                 <div id="frame">
                     <header id="header">
                         <h1>${page.pageName}</h1>
                     </header>
                     <div id="sidebar">
+                        <header id="countryHeader">
+                            <h2>
+                                Countries
+                            </h2>
+                        </header>
                         <div id="countryNavHolder">
                             <nav id="countryNav">
                                 <ul id="countryUl">
@@ -36,6 +43,11 @@ const page = {
                         </div>
                     </div>
                     <div id="centerPage">
+                        <header id="cityHeader>
+                            <h2>
+                                Cities
+                            </h2>
+                        </header>
                         <div id="cityListHolder">
                             <div id="cityListContainer">
                                 <ul id="cityUl">
@@ -113,6 +125,9 @@ const page = {
         //Lägg till class på modalContent som gör transition med translateY (med timeout annars blir det ingen animation)
         setTimeout(() => { document.getElementsByClassName("cityModal")[0].classList.add("open"); }, 10)
 
+        //visa Backdrop
+        page.showBackDrop();
+
         //Skapa event handler på stäng-knapp
         document.getElementById("closeModalBtn").addEventListener("click", eventHandlers.onModalBtnClosedClickedEventHandler)
 
@@ -132,6 +147,20 @@ const page = {
             visitedBtn.innerText = "Add to visited";
             visitedBtn.className = ""
         }
+    },
+    showBackDrop: () => {
+        document.getElementsByClassName("backDrop")[0].classList.add("show");
+    },
+    hideBackDrop: () => {
+        document.getElementsByClassName("backDrop")[0].className = "backDrop";
+    },
+    createUnchangingEventHandlers: () => {
+        //Backdrop click
+        document.getElementsByClassName("backDrop")[0].addEventListener("click", eventHandlers.onBackDropClicked);
+    },
+    closeModal: () => {
+        document.getElementsByClassName("cityModal")[0].classList.remove("open");
+        page.hideBackDrop();
     },
     pageName: "Travel Partner",
     currentCountry: null,
@@ -182,7 +211,8 @@ const eventHandlers = {
         console.log("curr city", page.currentCity);
     },
     onModalBtnClosedClickedEventHandler: () => {
-        document.getElementsByClassName("cityModal")[0].classList.remove("open");
+        page.closeModal();
+
     },
     onCountryVisitedBtnClickedEventHandler: () => {
         if (!appData.citiesVisited.includes(page.currentCity.id)) {
@@ -192,5 +222,8 @@ const eventHandlers = {
         }
 
         page.renderVisitedButton();
+    },
+    onBackDropClicked: () => {
+        page.closeModal();
     }
 }
