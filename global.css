@@ -35,7 +35,6 @@ body {
   background-color: grey;
 }
 
-
 #centerPage {
   position: absolute;
   left: 200px;
@@ -44,4 +43,110 @@ body {
   right: 0;
   transition: right 0.3s;
   background-color: darkgoldenrod;
+}
+
+/* LISTS */
+
+li {
+  list-style-type: none;
+  padding: 10px;
+  text-align: center;
+  margin: 10px;
+}
+li:hover {
+  box-shadow: 3px 2px 5px black;
+}
+li.active {
+  background-color: black;
+}
+
+#countryOl {
+}
+
+/* MODAL */
+
+#modalHolder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cityModal {
+  position: absolute;
+  z-index: 100;
+  width: 400px;
+  height: 250px;
+  background-color: white;
+  border: 3px solid black;
+  transform: translateY(-250%);
+  transition: transform .3s;
+}
+
+.cityModal.open{
+  transform: translateY(0);
+  transition: transform .3s;
+}
+
+#modalWindowHeader {
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+}
+
+#modalCloseBtnHolder {
+  position: absolute;
+  top: 0;
+  width: 40px;
+  right: 0;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#closeModalBtn {
+  background-color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 20px;
+  transition: box-shadow .3s;
+  outline: none;
+}
+
+#closeModalBtn:hover {
+  box-shadow: 3px 2px 4px grey;
+  transition: box-shadow .3s;
+}
+
+#modalContainer{
+  width: 100%;
+  height: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#modalHeader{
+  position: absolute;
+  width: 80%;
+  top: 0px;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#modalContent{
+  position: absolute;
+  width: 90%;
+  top: 70px;
+  height: 170px;
+  display: grid;
 }
