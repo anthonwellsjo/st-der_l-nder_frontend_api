@@ -1,27 +1,22 @@
-
 document.body.onload = loadApp;
-
 
 async function loadApp() {
     await appData.get();
     appData.fetchVisitedCitiesFromLocalStorage();
     const app = document.getElementById("app");
-    page.appendChild(page.create(), app);
+    app.innerHTML = page.create();
+    page.setBackgroundImage();
     page.renderCountryList();
     page.createUnchangingEventHandlers();
-
-
 }
-
-
-
-
-
 
 const page = {
     create: function () {
         return (
-            `<div id="pageHolder">
+            `
+            <img id="backgroundImg"></img>
+            <div id="spinnerHolder"><img id="spinner" src="https://media0.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif?cid=ecf05e471rg1w4iot45hb8537piyun4xtfq7tv4yv4qqrq3r&rid=giphy.gif"></img></div>
+            <div id="pageHolder">
                 <div id="modalHolder">
                 </div>
                 <div class="backDrop">
@@ -65,13 +60,8 @@ const page = {
             </div>`
         )
     },
-    appendChild: function (child, parent) {
-        parent.innerHTML = child;
-        return;
-    },
     renderCountryList: () => {
         appData.countries.forEach(country => {
-            console.log(country)
             let li = document.createElement("li");
             li.setAttribute("class", "countryListItem");
             li.addEventListener("click", (e) => eventHandlers.onCountryClickEventHandler(e))
@@ -83,7 +73,6 @@ const page = {
         document.getElementById("cityListInfoHolder").innerHTML = "";
         page.visitedCitiesShowing = false;
         if (page.currentCountry !== page.currentlyRenderedCountryCityList) {
-            console.log("rendering city list");
             document.getElementById("cityUl").innerHTML = "";
             const citiesToRender = appData.cities.filter(cit => cit.countryid === page.currentCountry.id);
             citiesToRender.forEach(city => {
@@ -102,10 +91,8 @@ const page = {
     renderVisitedCityList: () => {
         if (page.currentlyRenderedCountryCityList !== appData.citiesVisited) {
             if (appData.citiesVisited.length > 0) {
-                console.log("render cities visited", appData.citiesVisited);
                 document.getElementById("cityUl").innerHTML = "";
                 const citiesToRender = appData.cities.filter(cit => appData.citiesVisited.includes(cit.id));
-                console.log("cities to render", citiesToRender);
                 citiesToRender.forEach(city => {
                     let li = document.createElement("li");
                     li.setAttribute("class", "cityListItem")
@@ -261,8 +248,17 @@ const page = {
             page.bordersShowing = false;
         }
     },
-    toggleShowInfoBox: ()=>{
+    toggleShowInfoBox: () => {
         document.getElementById("cityListInfoContainer").setAttribute("class", "show");
+    },
+    toggleShowBackground: () => {
+        if (!page.backgroundShowing) {
+            document.getElementById("frame").classList.add("open");
+            page.backgroundShowing = true;
+        } else {
+            document.getElementById("frame").classList.remove("open");
+            page.backgroundShowing = false;
+        }
     },
     closeModalGroupFunction: () => {
         page.disactiveCityListItems();
@@ -272,6 +268,13 @@ const page = {
             page.renderVisitedCityList();
         }
     },
+    setBackgroundImage: () => {
+        const width = window.screen.width;
+        const height = window.screen.height;
+        let img = document.getElementById("backgroundImg");
+        img.addEventListener("load", eventHandlers.onBackgroundLoaded);
+        img.setAttribute("src", `https://picsum.photos/${width}/${height}`);
+    },
     pageName: "Travel Partner",
     currentCountry: {},
     currentlyRenderedCountryCityList: undefined,
@@ -279,7 +282,8 @@ const page = {
     allVisibleListItemsShowing: false,
     citiesHeaderShowing: false,
     bordersShowing: false,
-    visitedCitiesShowing: false
+    visitedCitiesShowing: false,
+    backgroundShowing: false
 }
 
 const appData = {
@@ -301,14 +305,11 @@ const appData = {
             })
         ))
 
-        console.log("countrydata", countryData);
-        console.log("citydata", cityData);
         appData.countries = countryData;
         appData.cities = cityData;
         appData.hasBeenFetched = true;
     }),
     storeVisitedCitiesToLocalStorage: () => {
-        console.log("info to store", appData.citiesVisited);
         localStorage.setItem("citiesVisited", JSON.stringify(appData.citiesVisited))
     },
     fetchVisitedCitiesFromLocalStorage: () => {
@@ -317,7 +318,6 @@ const appData = {
             const idsToAdd = JSON.parse(localStorage.getItem("citiesVisited")).map(id => +id);
 
             appData.citiesVisited = idsToAdd;
-            console.log("getting local storage", appData.citiesVisited);
         } else {
             appData.citiesVisited = [];
         }
@@ -330,7 +330,6 @@ const appData = {
     calculateTotalPopulations: () => {
         let totalPop = 0;
         const cities = appData.cities.filter(c => appData.citiesVisited.includes(c.id));
-        console.log("cities", cities);
         cities.forEach(c => totalPop += c.population);
         return totalPop;
     },
@@ -339,7 +338,6 @@ const appData = {
     countries: {},
     citiesVisited: []
 }
-
 
 const eventHandlers = {
     onCountryClickEventHandler: e => {
@@ -350,11 +348,9 @@ const eventHandlers = {
     },
     onCityClickEventHandler: e => {
         e.target.classList.add("active");
-        console.log(e.target.innerText)
-        console.log(appData.cities);
         page.currentCity = appData.cities.find(c => c.stadname == e.target.innerText);
+        page.currentCountry = appData.countries.find(c => c.id === page.currentCity.countryid);
         page.renderCityModalPage();
-        console.log("curr city", page.currentCity);
     },
     onModalBtnClosedClickedEventHandler: () => {
         page.closeModalGroupFunction();
@@ -374,15 +370,22 @@ const eventHandlers = {
         page.toggleShowListItems();
         page.toggleShowCitiesHeader();
         page.toggleShowBorders();
+        page.toggleShowBackground();
     },
     onCitiesVisitedClicked: e => {
-        console.log("cities visited clicked", appData.citiesVisited);
         page.disactiveCountryListItems();
         e.target.classList.add("active");
         page.renderVisitedCityList();
     },
-    onClearHistoryBtnClicked: ()=>{
+    onClearHistoryBtnClicked: () => {
         appData.clearLocalStorage();
         page.renderVisitedCityList();
+    },
+    onBackgroundLoaded: () => {
+        document.getElementById("spinner").setAttribute("class", "hide");
+        document.getElementById("backgroundImg").setAttribute("class", "show");
+        setTimeout(()=>{ document.getElementById("frame").setAttribute("class", "show");}, 600);
+        document.getElementById("spinner").remove();
+        document.getElementById("spinnerHolder").remove();
     }
 }
