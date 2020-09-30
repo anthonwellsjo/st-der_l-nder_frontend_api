@@ -1,27 +1,25 @@
-
 document.body.onload = loadApp;
-
 
 async function loadApp() {
     await appData.get();
     appData.fetchVisitedCitiesFromLocalStorage();
     const app = document.getElementById("app");
     page.appendChild(page.create(), app);
+    page.setBackgroundImage();
     page.renderCountryList();
     page.createUnchangingEventHandlers();
 
 
+
 }
-
-
-
-
-
 
 const page = {
     create: function () {
         return (
-            `<div id="pageHolder">
+            `
+            <img id="backgroundImg"></img>
+            <div id="spinnerHolder"><img id="spinner" src="https://media0.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif?cid=ecf05e471rg1w4iot45hb8537piyun4xtfq7tv4yv4qqrq3r&rid=giphy.gif"></img></div>
+            <div id="pageHolder">
                 <div id="modalHolder">
                 </div>
                 <div class="backDrop">
@@ -261,8 +259,17 @@ const page = {
             page.bordersShowing = false;
         }
     },
-    toggleShowInfoBox: ()=>{
+    toggleShowInfoBox: () => {
         document.getElementById("cityListInfoContainer").setAttribute("class", "show");
+    },
+    toggleShowBackground: () => {
+        if (!page.backgroundShowing) {
+            document.getElementById("frame").classList.add("open");
+            page.backgroundShowing = true;
+        } else {
+            document.getElementById("frame").classList.remove("open");
+            page.backgroundShowing = false;
+        }
     },
     closeModalGroupFunction: () => {
         page.disactiveCityListItems();
@@ -272,6 +279,13 @@ const page = {
             page.renderVisitedCityList();
         }
     },
+    setBackgroundImage: () => {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        let img = document.getElementById("backgroundImg");
+        img.addEventListener("load", eventHandlers.onBackgroundLoaded);
+        img.setAttribute("src", `https://picsum.photos/${width}/${height}`);
+    },
     pageName: "Travel Partner",
     currentCountry: {},
     currentlyRenderedCountryCityList: undefined,
@@ -279,7 +293,8 @@ const page = {
     allVisibleListItemsShowing: false,
     citiesHeaderShowing: false,
     bordersShowing: false,
-    visitedCitiesShowing: false
+    visitedCitiesShowing: false,
+    backgroundShowing: false
 }
 
 const appData = {
@@ -340,7 +355,6 @@ const appData = {
     citiesVisited: []
 }
 
-
 const eventHandlers = {
     onCountryClickEventHandler: e => {
         page.disactiveCountryListItems();
@@ -353,6 +367,7 @@ const eventHandlers = {
         console.log(e.target.innerText)
         console.log(appData.cities);
         page.currentCity = appData.cities.find(c => c.stadname == e.target.innerText);
+        page.currentCountry = appData.countries.find(c => c.id === page.currentCity.countryid);
         page.renderCityModalPage();
         console.log("curr city", page.currentCity);
     },
@@ -374,6 +389,7 @@ const eventHandlers = {
         page.toggleShowListItems();
         page.toggleShowCitiesHeader();
         page.toggleShowBorders();
+        page.toggleShowBackground();
     },
     onCitiesVisitedClicked: e => {
         console.log("cities visited clicked", appData.citiesVisited);
@@ -381,8 +397,15 @@ const eventHandlers = {
         e.target.classList.add("active");
         page.renderVisitedCityList();
     },
-    onClearHistoryBtnClicked: ()=>{
+    onClearHistoryBtnClicked: () => {
         appData.clearLocalStorage();
         page.renderVisitedCityList();
+    },
+    onBackgroundLoaded: () => {
+        document.getElementById("spinner").setAttribute("class", "hide");
+        document.getElementById("backgroundImg").setAttribute("class", "show");
+        setTimeout(()=>{ document.getElementById("frame").setAttribute("class", "show");}, 600);
+        document.getElementById("spinner").remove();
+        document.getElementById("spinnerHolder").remove();
     }
 }
