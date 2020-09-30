@@ -2,6 +2,7 @@
 
 html,
 body {
+  overflow: hidden;
 }
 
 #backgroundImg{
@@ -49,6 +50,10 @@ li.cityListItem {
 
 li.countryListItem {
   font-size: 19px;
+}
+
+#citiesVisited{
+  font-weight: bold;
 }
 
 #outerFrame {
