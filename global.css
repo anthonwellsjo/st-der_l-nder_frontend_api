@@ -2,13 +2,25 @@
 
 html,
 body {
+  background-image: url("https://picsum.photos/1300/900");
+}
+
+#outerFrame {
+  position: absolute; 
+  left: 0; 
+  right: 0; 
+  margin-left: auto; 
+  margin-right: auto; 
+  width: 550px;
 }
 
 #frame {
   position: absolute;
-  left: 20%;
-  right: 20%;
-  height: 100%;
+  height: 700px;
+  width: 550px;
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  border-radius: 3px;
 }
 
 #header {
@@ -22,7 +34,6 @@ body {
   justify-content: center;
   background-color: black;
   color: white;
-  border-bottom: 3px solid black;
 }
 
 #header h1 {
@@ -37,8 +48,6 @@ body {
   left: 0;
   height: 400px;
   width: 200px;
-  border-top: 3px solid black;
-  
 }
 
 #countryHeader {
@@ -64,7 +73,6 @@ body {
   top: 150px;
   bottom: 0;
   right: 0;
-  border-top: 3px solid black;
 }
 
 #cityHeader {
@@ -253,18 +261,56 @@ ul {
   width: 3px;
   height: 0;
   background-color: black;
-  transition: height .7s;
+  transition: height 0.7s;
 }
 
-#sidebarVerticalBorder.show{
+#sidebarVerticalBorder.show {
   height: 400px;
-  transition: height .7s;
+  transition: height 0.7s;
 }
 
-#headerBottomBorder{
+#headerBottomBorder {
   position: absolute;
   bottom: 0;
   height: 3px;
-  width: 300px;
+  width: 0;
   background-color: black;
+  margin-left: -18px;
+  transition: width 0.7s;
+}
+
+#headerBottomBorder.show {
+  width: 538px;
+  transition: width 0.7s;
+}
+
+/* -----------------------------------------------------------INFOBOX */
+
+#cityListInfoHolder {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#cityListInfoContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 20px;
+  margin-left: 20px;
+  padding: 20px;
+  width: 70%;
+  transform: scale(0);
+  transition: transform 0.3s;
+  box-shadow: 3px 2px 3px grey;
+}
+
+#cityListInfoContainer.show {
+  transform: scale(1);
+  transition: transform 0.3s;
+}
+
+#clearHistoryBtn {
+  background-color: red;
 }

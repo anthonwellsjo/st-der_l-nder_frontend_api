@@ -4,10 +4,12 @@ document.body.onload = loadApp;
 
 async function loadApp() {
     await appData.get();
+    appData.fetchVisitedCitiesFromLocalStorage();
     const app = document.getElementById("app");
     page.appendChild(page.create(), app);
     page.renderCountryList();
     page.createUnchangingEventHandlers();
+
 
 }
 
@@ -24,34 +26,38 @@ const page = {
                 </div>
                 <div class="backDrop">
                 </div>
-                <div id="frame">
-                    <header id="header">
-                        <h1>${page.pageName}</h1>
-                    </header>
-                    <div id="sidebar">
-                        <div id="sidebarVerticalBorder">
-                        </div>
-                        <header id="countryHeader">
-                            <h2>
-                                Countries
-                            </h2>
-                            <div id="headerBottomBorder"></div>
+                <div id="outerFrame">
+                    <div id="frame">
+                        <header id="header">
+                            <h1>${page.pageName}</h1>
                         </header>
-                        <div id="countryNavHolder">
-                            <nav id="countryNav">
-                                <ul id="countryUl">
-                                </ul>
-                            </nav>
+                        <div id="sidebar">
+                            <div id="sidebarVerticalBorder">
+                            </div>
+                            <header id="countryHeader">
+                                <h2>
+                                    Countries
+                                </h2>
+                                <div id="headerBottomBorder"></div>
+                            </header>
+                            <div id="countryNavHolder">
+                                <nav id="countryNav">
+                                    <ul id="countryUl">
+                                    <li id="citiesVisited" class="countryListItem">Cities visited</li>
+                                    </ul>
+                                </nav>
+                            </div>
                         </div>
-                    </div>
-                    <div id="centerPage">
-                        <header id="cityHeader">
-                            <h2 id="cityHeaderH2">Cities</h2>
-                        </header>
-                        <div id="cityListHolder">
-                            <div id="cityListContainer">
-                                <ul id="cityUl">
-                                </ul>
+                        <div id="centerPage">
+                            <header id="cityHeader">
+                                <h2 id="cityHeaderH2">Cities</h2>
+                            </header>
+                            <div id="cityListHolder">
+                                <div id="cityListContainer">
+                                    <ul id="cityUl">
+                                    </ul>
+                                </div>
+                                <div id="cityListInfoHolder"></div>
                             </div>
                         </div>
                     </div>
@@ -70,10 +76,12 @@ const page = {
             li.setAttribute("class", "countryListItem");
             li.addEventListener("click", (e) => eventHandlers.onCountryClickEventHandler(e))
             li.innerHTML = country.countryname;
-            document.getElementById("countryUl").appendChild(li);
+            document.getElementById("countryUl").prepend(li);
         })
     },
     renderCityList: () => {
+        document.getElementById("cityListInfoHolder").innerHTML = "";
+        page.visitedCitiesShowing = false;
         if (page.currentCountry !== page.currentlyRenderedCountryCityList) {
             console.log("rendering city list");
             document.getElementById("cityUl").innerHTML = "";
@@ -87,6 +95,40 @@ const page = {
             })
             page.allVisibleListItemsShowing = false;
             setTimeout(() => { page.toggleShowListItems(); }, 10);
+
+            page.currentlyRenderedCountryCityList = page.currentCountry;
+        }
+    },
+    renderVisitedCityList: () => {
+        if (page.currentlyRenderedCountryCityList !== appData.citiesVisited) {
+            if (appData.citiesVisited.length > 0) {
+                console.log("render cities visited", appData.citiesVisited);
+                document.getElementById("cityUl").innerHTML = "";
+                const citiesToRender = appData.cities.filter(cit => appData.citiesVisited.includes(cit.id));
+                console.log("cities to render", citiesToRender);
+                citiesToRender.forEach(city => {
+                    let li = document.createElement("li");
+                    li.setAttribute("class", "cityListItem")
+                    li.innerText = city.stadname;
+                    li.addEventListener("click", (e) => eventHandlers.onCityClickEventHandler(e))
+                    document.getElementById("cityUl").appendChild(li);
+                })
+                document.getElementById("cityListInfoHolder").innerHTML = `
+                    <div id="cityListInfoContainer">
+                        <p>During your travels you may have crossed paths with ${appData.calculateTotalPopulations()} people.</P>
+                        <button id="clearHistoryBtn">Delete your travel history</button>
+                    </div>
+                    `;
+
+                document.getElementById("clearHistoryBtn").addEventListener("click", eventHandlers.onClearHistoryBtnClicked);
+                page.allVisibleListItemsShowing = false;
+                setTimeout(() => { page.toggleShowListItems(); page.toggleShowInfoBox(); }, 10);
+                page.visitedCitiesShowing = true;
+                page.currentlyRenderedCountryCityList = appData.citiesVisited;
+            } else {
+                document.getElementById("cityUl").innerHTML = "";
+                document.getElementById("cityListInfoHolder").innerHTML = "<h3>No cities visited so far...</h3>";
+            }
         }
     },
     renderCityModalPage: () => {
@@ -162,6 +204,9 @@ const page = {
 
         //Country Click
         document.getElementById("countryHeader").addEventListener("click", eventHandlers.onCountriesHeaderClicked)
+
+        //Cities visited Click
+        document.getElementById("citiesVisited").addEventListener("click", e => { eventHandlers.onCitiesVisitedClicked(e) })
     },
     closeModal: () => {
         document.getElementsByClassName("cityModal")[0].classList.remove("open");
@@ -203,18 +248,38 @@ const page = {
         }
     },
     toggleShowBorders: () => {
-        if (!page.bordersShowing) {
-            document.getElementById("sidebarVerticalBorder").setAttribute("class", "show");
+        let verticalBorder = document.getElementById("sidebarVerticalBorder");
+        let horizontalBorder = document.getElementById("headerBottomBorder");
 
+        if (!page.bordersShowing) {
+            verticalBorder.setAttribute("class", "show");
+            horizontalBorder.setAttribute("class", "show");
+            page.bordersShowing = true;
+        } else {
+            verticalBorder.removeAttribute("class", "show");
+            horizontalBorder.removeAttribute("class", "show");
+            page.bordersShowing = false;
+        }
+    },
+    toggleShowInfoBox: ()=>{
+        document.getElementById("cityListInfoContainer").setAttribute("class", "show");
+    },
+    closeModalGroupFunction: () => {
+        page.disactiveCityListItems();
+        page.closeModal();
+        appData.storeVisitedCitiesToLocalStorage();
+        if (page.visitedCitiesShowing) {
+            page.renderVisitedCityList();
         }
     },
     pageName: "Travel Partner",
-    currentCountry: null,
-    currentlyRenderedCountryCityList: null,
-    currentCity: null,
+    currentCountry: {},
+    currentlyRenderedCountryCityList: undefined,
+    currentCity: {},
     allVisibleListItemsShowing: false,
     citiesHeaderShowing: false,
     bordersShowing: false,
+    visitedCitiesShowing: false
 }
 
 const appData = {
@@ -242,6 +307,33 @@ const appData = {
         appData.cities = cityData;
         appData.hasBeenFetched = true;
     }),
+    storeVisitedCitiesToLocalStorage: () => {
+        console.log("info to store", appData.citiesVisited);
+        localStorage.setItem("citiesVisited", JSON.stringify(appData.citiesVisited))
+    },
+    fetchVisitedCitiesFromLocalStorage: () => {
+        if (localStorage.getItem("citiesVisited") !== null) {
+
+            const idsToAdd = JSON.parse(localStorage.getItem("citiesVisited")).map(id => +id);
+
+            appData.citiesVisited = idsToAdd;
+            console.log("getting local storage", appData.citiesVisited);
+        } else {
+            appData.citiesVisited = [];
+        }
+    },
+    clearLocalStorage: () => {
+        localStorage.removeItem("citiesVisited");
+        appData.fetchVisitedCitiesFromLocalStorage();
+    }
+    ,
+    calculateTotalPopulations: () => {
+        let totalPop = 0;
+        const cities = appData.cities.filter(c => appData.citiesVisited.includes(c.id));
+        console.log("cities", cities);
+        cities.forEach(c => totalPop += c.population);
+        return totalPop;
+    },
     hasBeenFetched: false,
     cities: {},
     countries: {},
@@ -258,14 +350,14 @@ const eventHandlers = {
     },
     onCityClickEventHandler: e => {
         e.target.classList.add("active");
-        page.currentCity = appData.cities.find(c => c.stadname == e.target.innerHTML);
+        console.log(e.target.innerText)
+        console.log(appData.cities);
+        page.currentCity = appData.cities.find(c => c.stadname == e.target.innerText);
         page.renderCityModalPage();
         console.log("curr city", page.currentCity);
     },
     onModalBtnClosedClickedEventHandler: () => {
-        page.disactiveCityListItems();
-        page.closeModal();
-
+        page.closeModalGroupFunction();
     },
     onCountryVisitedBtnClickedEventHandler: () => {
         if (!appData.citiesVisited.includes(page.currentCity.id)) {
@@ -276,12 +368,21 @@ const eventHandlers = {
         page.renderVisitedButton();
     },
     onBackDropClicked: () => {
-        page.disactiveCityListItems();
-        page.closeModal();
+        page.closeModalGroupFunction();
     },
     onCountriesHeaderClicked: () => {
         page.toggleShowListItems();
         page.toggleShowCitiesHeader();
         page.toggleShowBorders();
+    },
+    onCitiesVisitedClicked: e => {
+        console.log("cities visited clicked", appData.citiesVisited);
+        page.disactiveCountryListItems();
+        e.target.classList.add("active");
+        page.renderVisitedCityList();
+    },
+    onClearHistoryBtnClicked: ()=>{
+        appData.clearLocalStorage();
+        page.renderVisitedCityList();
     }
 }
