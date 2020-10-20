@@ -91,26 +91,14 @@
   },
   {
     "id": 16,
-    "stadname": "asdasd",
-    "countryid": 1,
-    "population": 23232
+    "stadname": "Javascriptsgården",
+    "countryid": 4,
+    "population": 23000
   },
   {
     "id": 17,
-    "stadname": "Fiskbil",
-    "countryid": 2,
-    "population": 23232
-  },
-  {
-    "id": 18,
-    "stadname": "Fiskbil",
-    "countryid": 2,
-    "population": 23232
-  },
-  {
-    "id": 19,
-    "stadname": "Fiskbil",
-    "countryid": 2,
-    "population": 23232
+    "stadname": "finnebod",
+    "countryid": 4,
+    "population": 121212
   }
 ]

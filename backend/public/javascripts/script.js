@@ -1,7 +1,7 @@
 document.body.onload = start;
 
 let cities = {};
-let countries = [];
+let countries = {};
 
 async function start() {
     getNav();
@@ -43,16 +43,12 @@ const getNav = () => {
 }
 const getCountryPage = () => {
     document.getElementById("page").innerHTML = `
-        <form>
+        <form id="country-form">
             <div class="form-group">
                 <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Landsnamn">
             </div>
-            <div class="form-group">
-                <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Städer">
-            </div>
-            <div class="form-group">
-                <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Invånare">
-            </div>
+            <br>
+            <button type="submit">Spara</button>
         </form>
     `;
 }
@@ -80,6 +76,7 @@ const createEventHandlers = () => {
     document.getElementById("add-country-btn").addEventListener("click", (e) => {
         e.preventDefault();
         getCountryPage();
+        addCountryEventHandlers();
     });
     document.getElementById("add-city-btn").addEventListener("click", (e) => {
         e.preventDefault();
@@ -116,8 +113,35 @@ const addCityEventHandlers = () => {
             },
             body: JSON.stringify(cities)
         })
-            .then(res => res.json())
-            .then(res => { console.log(res) });
+            .then(res => res.text())
+            .then(res => console.log(res))
+            .catch(err => console.log(err))
+
+    });
+}
+const addCountryEventHandlers = () => {
+    document.getElementById("country-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const land = e.target.children[0].children[0].value;
+        console.log("land", land);
+
+        countries.push({
+            id: countries.length + 1,
+            countryname: land
+        });
+        console.log(countries);
+
+        fetch("/data/countries", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(countries)
+        })
+            .then(res => res.text())
+            .then(res => console.log(res))
+            .catch(err => console.log(err))
 
     });
 }

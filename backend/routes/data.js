@@ -10,6 +10,18 @@ router.get('/countries', function (req, res) {
     res.send(d);
   });
 });
+
+router.post('/countries', function (req, res) {
+  const data = JSON.stringify(req.body, null, 2);
+  console.log(data);
+  fs.writeFile('./json/land.json', data, (err) => {
+    if (err) throw err;
+  })
+
+
+  res.send("Land sparat!");
+});
+
 router.get('/cities', function (req, res) {
   fs.readFile('./json/stad.json', (err, data) => {
     if (err) throw err;

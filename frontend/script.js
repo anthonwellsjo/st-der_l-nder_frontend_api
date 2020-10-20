@@ -288,7 +288,7 @@ const page = {
 
 const appData = {
     get: (async url => {
-        let countryData = await (await (fetch('./src/json/land.json')
+        let countryData = await (await (fetch('http://localhost:3000/data/countries')
             .then(res => {
                 return res.json()
             })
@@ -296,7 +296,7 @@ const appData = {
                 console.log('Error: ', err)
             })
         ))
-        let cityData = await (await (fetch('./src/json/stad.json')
+        let cityData = await (await (fetch('http://localhost:3000/data/cities')
             .then(res => {
                 return res.json()
             })
